@@ -1,15 +1,14 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <cstdint>
 using namespace std;
 
 class BigInt {
-    string number;    // Stores the number as a string
-    bool isNegative;  // True if number is negative
+    string number;    
+    bool isNegative;
 
-    // Remove unnecessary leading zeros from the number string
     void removeLeadingZeros() {
-        // TODO: Implement this function
         while(number[0] == '0' && number.length() > 1 ){
             number.erase(0, 1);
         }
@@ -18,10 +17,7 @@ class BigInt {
         }
     }
 
-    // Compare absolute values of two BigInts (ignore signs)
-    // Returns: 1 if |this| > |other|, 0 if equal, -1 if |this| < |other|
     int compareMagnitude(const BigInt& other) const {
-        // TODO: Implement this function
         if (number.length() > other.number.length()){
             return 1;
         }
@@ -43,32 +39,24 @@ class BigInt {
     }
 
 public:
-    // Default constructor - initialize to zero
     BigInt() {
-        // TODO: Implement this constructor
         number = "0";
         isNegative = false;
     }
 
-    // Constructor from 64-bit integer
     BigInt(int64_t value) {
-        // TODO: Implement this constructor
         if (value < 0){
             isNegative = true;
             value = abs(value);
             number = to_string(value);
-
         }
         else {
             isNegative = false;
             number = to_string(value);
         }
-
     }
 
-    // Constructor from string representation
     BigInt(const string& str) {
-        // TODO: Implement this constructor
         if (str[0] == '-'){
             isNegative = true;
             number = str.substr(1);
@@ -80,9 +68,7 @@ public:
         removeLeadingZeros();
     }
 
-    // Copy constructor
     BigInt(const BigInt& other) {
-        // TODO: Implement this constructor
         number = other.number;
         isNegative = other.isNegative;
 
@@ -93,9 +79,11 @@ public:
         // TODO: Implement if needed
     }
 
-    // Assignment operator
     BigInt& operator=(const BigInt& other) {
-        // TODO: Implement this operator
+        if (this != &other) {
+            number = other.number;
+            isNegative = other.isNegative;
+        }
         return *this;
     }
 
@@ -175,19 +163,42 @@ public:
         return "";
     }
 
-    // Output stream operator (for printing)
     friend ostream& operator<<(ostream& os, const BigInt& num) {
-        // TODO: Implement this operator
+        if (num.number.empty()) {
+            os << '0';
+            return os;
+        }
+        if (num.isNegative && !(num.number.size() == 1 && num.number == "0")) {
+            os << '-';
+        }
+        os << num.number;
         return os;
     }
 
-    // Input stream operator (for reading from input)
     friend istream& operator>>(istream& is, BigInt& num) {
-        // TODO: Implement this operator
+        string s;
+        if (!(is >> s)) return is;
+        bool neg = false;
+        size_t idx = 0;
+        if (!s.empty() && (s[0] == '+' || s[0] == '-')) {
+            neg = (s[0] == '-');
+            idx = 1;
+        }
+        if (idx >= s.size()) { 
+            is.setstate(ios::failbit);
+            return is;
+        }
+        for (size_t i = idx; i < s.size(); ++i) {
+            if (!isdigit(static_cast<unsigned char>(s[i]))) {
+                is.setstate(ios::failbit);
+                return is;
+            }
+        }
+        num.number = s.substr(idx);
+        num.isNegative = neg;
+        num.removeLeadingZeros();
         return is;
     }
-
-    // Friend declarations for comparison operators
     friend bool operator==(const BigInt& lhs, const BigInt& rhs);
     friend bool operator<(const BigInt& lhs, const BigInt& rhs);
 };
@@ -227,40 +238,37 @@ BigInt operator%(BigInt lhs, const BigInt& rhs) {
     return result;
 }
 
-// Equality comparison operator (x == y)
 bool operator==(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    return lhs.isNegative == rhs.isNegative && lhs.number == rhs.number;
 }
 
-// Inequality comparison operator (x != y)
 bool operator!=(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    return !(lhs == rhs);
 }
 
-// Less-than comparison operator (x < y)
 bool operator<(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    if (lhs == rhs) return false;
+    if (lhs.isNegative != rhs.isNegative) return lhs.isNegative;
+
+    int mag = lhs.compareMagnitude(rhs);
+    if (!lhs.isNegative) {
+        // both non-negative
+        return (mag < 0);
+    } else {
+        return (mag > 0);
+    }
 }
 
-// Less-than-or-equal comparison operator (x <= y)
 bool operator<=(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    return (lhs < rhs) || (lhs == rhs);
 }
 
-// Greater-than comparison operator (x > y)
 bool operator>(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    return rhs < lhs;
 }
 
-// Greater-than-or-equal comparison operator (x >= y)
 bool operator>=(const BigInt& lhs, const BigInt& rhs) {
-    // TODO: Implement this operator
-    return false;
+    return !(lhs < rhs);
 }
 
 int main() {

@@ -9,12 +9,35 @@ class BigInt {
     // Remove unnecessary leading zeros from the number string
     void removeLeadingZeros() {
         // TODO: Implement this function
+        while(number[0] == '0' && number.length() > 1 ){
+            number.erase(0, 1);
+        }
+        if(number == "0"){
+            isNegative = false;
+        }
     }
 
     // Compare absolute values of two BigInts (ignore signs)
     // Returns: 1 if |this| > |other|, 0 if equal, -1 if |this| < |other|
     int compareMagnitude(const BigInt& other) const {
         // TODO: Implement this function
+        if (number.length() > other.number.length()){
+            return 1;
+        }
+        else if (number.length() < other.number.length()){
+            return -1;
+        }
+        else {
+            if (number > other.number){
+                return 1;
+            }
+            else if (number < other.number){
+                return -1;
+            }
+            else {
+               return 0;
+            }
+        }
         return 0;
     }
 

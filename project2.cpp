@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 using namespace std;
 
 class BigInt {
@@ -45,21 +46,46 @@ public:
     // Default constructor - initialize to zero
     BigInt() {
         // TODO: Implement this constructor
+        number = "0";
+        isNegative = false;
     }
 
     // Constructor from 64-bit integer
     BigInt(int64_t value) {
         // TODO: Implement this constructor
+        if (value < 0){
+            isNegative = true;
+            value = abs(value);
+            number = to_string(value);
+
+        }
+        else {
+            isNegative = false;
+            number = to_string(value);
+        }
+
     }
 
     // Constructor from string representation
     BigInt(const string& str) {
         // TODO: Implement this constructor
+        if (str[0] == '-'){
+            isNegative = true;
+            number = str.substr(1);
+        }
+        else{
+            isNegative = false;
+            number = str;
+        }
+        removeLeadingZeros();
     }
 
     // Copy constructor
     BigInt(const BigInt& other) {
         // TODO: Implement this constructor
+        number = other.number;
+        isNegative = other.isNegative;
+
     }
 
     // Destructor

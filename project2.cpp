@@ -115,11 +115,48 @@ public:
         return *this;
     }
 
-    // Multiplication assignment operator (x *= y)
     BigInt& operator*=(const BigInt& other) {
-        // TODO: Implement this operator
+    // If either number is zero, the result is zero
+    if (number == "0" || other.number == "0") {
+        number = "0";
+        isNegative = false;
         return *this;
     }
+    int len1 = number.size();
+    int len2 = other.number.size();
+    // Result can have at most len1 + len2 digits
+    vector<int> result(len1 + len2, 0);
+    // Multiply digit by digit
+    for (int i = len1 - 1; i >= 0; i--) {
+        for (int j = len2 - 1; j >= 0; j--) {
+            int digit1 = number[i] - '0';
+            int digit2 = other.number[j] - '0';
+            result[i + j + 1] += digit1 * digit2;
+        }
+    }
+    // Handle carries
+    for (int i = len1 + len2 - 1; i > 0; i--) {
+        result[i - 1] += result[i] / 10;
+        result[i] %= 10;
+    }
+    // Convert result array to string
+    string resultString;
+    int i = 0;
+    // Skip leading zeros
+    while (i < len1 + len2 - 1 && result[i] == 0) {
+        i++;
+    }
+    while (i < len1 + len2) {
+        resultString += char(result[i] + '0');
+        i++;
+    }
+    number = resultString;
+    // XOR rule for the sign
+    isNegative = isNegative ^ other.isNegative;
+    // Zero must never be negative
+    removeLeadingZeros();
+    return *this;
+}
 
     // Division assignment operator (x /= y)
     BigInt& operator/=(const BigInt& other) {
@@ -221,9 +258,8 @@ BigInt operator-(BigInt lhs, const BigInt& rhs) {
 
 // Binary multiplication operator (x * y)
 BigInt operator*(BigInt lhs, const BigInt& rhs) {
-    BigInt result;
-    // TODO: Implement this operator
-    return result;
+    lhs *= rhs;
+    return lhs;
 }
 
 // Binary division operator (x / y)

@@ -2,6 +2,7 @@
 #include <string>
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 using namespace std;
 
 class BigInt {
@@ -37,6 +38,48 @@ class BigInt {
         }
         return 0;
     }
+    static string addMagnitudes(const string& num1, const string& num2) {
+        string result = "";
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        int carry = 0;
+
+        while (i >= 0 || j >= 0 || carry > 0) {
+            int sum = carry;
+            if (i >= 0) sum += (num1[i--] - '0');
+            if (j >= 0) sum += (num2[j--] - '0');
+
+            carry = sum / 10;
+            result += to_string(sum % 10);
+        }
+
+        reverse(result.begin(), result.end());
+        return result;
+    }
+
+    static string subtractMagnitudes(const string& num1, const string& num2) {
+        string result = "";
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        int borrow = 0;
+
+        while (i >= 0) {
+            int sub = (num1[i--] - '0') - borrow;
+            if (j >= 0) sub -= (num2[j--] - '0');
+
+            if (sub < 0) {
+                sub += 10;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
+            result += to_string(sub);
+        }
+
+        reverse(result.begin(), result.end());
+        return result;
+    }
+
 
 public:
     BigInt() {
@@ -104,8 +147,30 @@ public:
     }
 
     // Addition assignment operator (x += y)
-    BigInt& operator+=(const BigInt& other) {
-        // TODO: Implement this operator
+   BigInt& operator+=(const BigInt& other) {
+        if (this->isNegative == other.isNegative) {
+            this->number = addMagnitudes(this->number, other.number);
+        }
+        else {
+            int magCompare = compareMagnitude(other);
+
+            if (magCompare == 0) {
+
+                this->number = "0";
+                this->isNegative = false;
+            }
+            else if (magCompare > 0) {
+
+                this->number = subtractMagnitudes(this->number, other.number);
+
+            }
+            else {
+                this->number = subtractMagnitudes(other.number, this->number);
+                this->isNegative = other.isNegative;
+            }
+        }
+
+        removeLeadingZeros();
         return *this;
     }
 
@@ -207,9 +272,8 @@ public:
 
 // Binary addition operator (x + y)
 BigInt operator+(BigInt lhs, const BigInt& rhs) {
-    BigInt result;
-    // TODO: Implement this operator
-    return result;
+    lhs += rhs;
+    return lhs;
 }
 
 // Binary subtraction operator (x - y)

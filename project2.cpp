@@ -5,7 +5,7 @@
 using namespace std;
 
 class BigInt {
-    string number;    
+    string number;
     bool isNegative;
 
     void removeLeadingZeros() {
@@ -89,15 +89,17 @@ public:
 
     // Unary negation operator (-x)
     BigInt operator-() const {
-        BigInt result;
-        // TODO: Implement negation logic
+        BigInt result(*this);
+        // Zero stays non-negative so it never prints as "-0"
+        if (result.number != "0") {
+            result.isNegative = !result.isNegative;
+        }
         return result;
     }
 
     // Unary plus operator (+x)
     BigInt operator+() const {
-        BigInt result;
-        // TODO: Implement this operator
+        BigInt result(*this);
         return result;
     }
 
@@ -133,27 +135,27 @@ public:
 
     // Pre-increment operator (++x)
     BigInt& operator++() {
-        // TODO: Implement this operator
+        *this += BigInt(1);
         return *this;
     }
 
     // Post-increment operator (x++)
     BigInt operator++(int) {
-        BigInt temp;
-        // TODO: Implement this operator
+        BigInt temp(*this);
+        ++(*this);
         return temp;
     }
 
     // Pre-decrement operator (--x)
     BigInt& operator--() {
-        // TODO: Implement this operator
+        *this -= BigInt(1);
         return *this;
     }
 
     // Post-decrement operator (x--)
     BigInt operator--(int) {
-        BigInt temp;
-        // TODO: Implement this operator
+        BigInt temp(*this);
+        --(*this);
         return temp;
     }
 
@@ -184,7 +186,7 @@ public:
             neg = (s[0] == '-');
             idx = 1;
         }
-        if (idx >= s.size()) { 
+        if (idx >= s.size()) {
             is.setstate(ios::failbit);
             return is;
         }

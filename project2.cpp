@@ -123,13 +123,54 @@ public:
 
     // Division assignment operator (x /= y)
     BigInt& operator/=(const BigInt& other) {
-        // TODO: Implement this operator
+        if(other.number=="0"){//division by zero
+        throw runtime_error("Division bt zero");
+        }
+            bool finalsign=isNegative^other.isNegative;//detecting the sign
+        
+           if(compareMagnitude(other)==-1){//divisor greater 
+               number="0";
+               isNegative=false;
+               return *this;}
+        
+        
+            string result;
+            BigInt divisor =other;
+          divisor.isNegative=false;
+         BigInt current("0");
+        for(size_t i=0;i<number.length;i++){
+            current=current*BigInt(10)+BigInt(number[i]-"0");
+            int low=0,high=9,s=0;
+            while(low<=high){
+                int mid=(low+high)/2;
+                BigInt product=divisor*BigInt(mid);
+                if(product.compareMagnitude(current)<=0){
+                    s=mid;
+                    low=mid+1;
+                }
+                else{
+                    high=mid-1;
+                }
+            }
+                BigInt product =divisor*BigInt(s);
+                current=current-product;
+                 result+=to_string(s);
+        }
+        number=result;
+        isNegative=finalsign;
+        removeLeadingZeros();
+            
+                
         return *this;
     }
 
     // Modulus assignment operator (x %= y)
     BigInt& operator%=(const BigInt& other) {
-        // TODO: Implement this operator
+         if(other.number=="0"){//division by zero
+        throw runtime_error("Division bt zero");
+        }
+        BigInt q=*this/other;
+        *this=*this-(q*other);
         return *this;
     }
 
@@ -229,14 +270,16 @@ BigInt operator*(BigInt lhs, const BigInt& rhs) {
 // Binary division operator (x / y)
 BigInt operator/(BigInt lhs, const BigInt& rhs) {
     BigInt result;
-    // TODO: Implement this operator
+  lhs/=rhs;
+    result=lhs;
     return result;
 }
 
 // Binary modulus operator (x % y)
 BigInt operator%(BigInt lhs, const BigInt& rhs) {
     BigInt result;
-    // TODO: Implement this operator
+    lhs%=rhs;
+    result=lhs;
     return result;
 }
 
